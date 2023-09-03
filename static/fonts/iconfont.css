@@ -1,0 +1,107 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 4234473 */
+  src: url('@/static/fonts/iconfont.woff2?t=1693665293606') format('woff2'),
+       url('@/static/fonts/iconfont.woff?t=1693665293606') format('woff'),
+       url('@/static/fonts/iconfont.ttf?t=1693665293606') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-gou:before {
+  content: "\e610";
+}
+
+.icon-zitiyanse:before {
+  content: "\e618";
+}
+
+.icon-tupian:before {
+  content: "\e629";
+}
+
+.icon-jiacu:before {
+  content: "\e613";
+}
+
+.icon-xieti:before {
+  content: "\e614";
+}
+
+.icon-xiahuaxian:before {
+  content: "\e615";
+}
+
+.icon-add:before {
+  content: "\e664";
+}
+
+.icon-arrow-down:before {
+  content: "\e665";
+}
+
+.icon-browse:before {
+  content: "\e666";
+}
+
+.icon-close:before {
+  content: "\e668";
+}
+
+.icon-comment:before {
+  content: "\e669";
+}
+
+.icon-direction-down:before {
+  content: "\e66b";
+}
+
+.icon-direction-right:before {
+  content: "\e66c";
+}
+
+.icon-direction-up:before {
+  content: "\e66d";
+}
+
+.icon-direction-left:before {
+  content: "\e670";
+}
+
+.icon-electronics:before {
+  content: "\e671";
+}
+
+.icon-edit:before {
+  content: "\e672";
+}
+
+.icon-good:before {
+  content: "\e673";
+}
+
+.icon-fullscreen-shrink:before {
+  content: "\e676";
+}
+
+.icon-fullscreen-expand:before {
+  content: "\e675";
+}
+
+.icon-share:before {
+  content: "\e67d";
+}
+
+.icon-sign-out:before {
+  content: "\e67e";
+}
+
+.icon-elipsis:before {
+  content: "\e66e";
+}
+
