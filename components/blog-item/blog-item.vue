@@ -3,7 +3,7 @@
 		<view class="head">
 			<view class="userinfo">
 				<view class="avator">
-					<image src="../../static/logo.png" mode="aspectFill"></image>
+					<image src="../../static/images/sh.png" mode="aspectFill"></image>
 				</view>
 				<view class="name">admin</view>
 				<view class="time">
