@@ -34,7 +34,7 @@
 				list: [
 					{
 						name: '最新',
-						type:"pulish_data"
+						type:"publish_date"
 					}, 
 					{
 						name: '热门',

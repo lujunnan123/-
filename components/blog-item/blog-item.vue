@@ -19,8 +19,8 @@
 		</view>
 		
 		<view class="body">
-			<view class="title">{{item.title}}</view>
-			<view class="text">
+			<view class="title"  @click="goDetail">{{item.title}}</view>
+			<view class="text" @click="goDetail">
 				<view class="t">
 						{{item.description}}
 				</view>
@@ -38,7 +38,7 @@
 				</text>
 				<text>{{item.view_count}}</text>
 			</view>
-			<view class="box">
+			<view class="box"  @click="goDetail">
 				<text class="iconfont icon-comment">
 				</text>
 				<text>{{item.comment_count}}</text>
@@ -75,6 +75,12 @@
 				uni.previewImage({
 					urls:this.item.picurls,
 					current:index
+				})
+			},
+			// 跳转详情
+			goDetail(){
+				uni.navigateTo({
+					url:"/pages/detail/detail?id="+this.item._id
 				})
 			}
 		}
