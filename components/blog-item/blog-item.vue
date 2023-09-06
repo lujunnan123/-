@@ -3,12 +3,12 @@
 		<view class="head">
 			<view class="userinfo">
 				<view class="avator">
-					<image src="../../static/images/sh.png" mode="aspectFill"></image>
+					<image :src="item.user_id[0].avatar_file || '../../static/images/sh.png'" mode="aspectFill"></image>
 				</view>
-				<view class="name">admin</view>
+				<view class="name">{{item.user_id[0].nickname ? item.user_id[0].nickname : item.user_id[0].username }}</view>
 				<view class="time">
-					<uni-dateformat :date="Date.now()" format="MM月dd hh:mm"
-						:threshold="[60000,3600000*24*30]"></uni-dateformat>
+					<uni-dateformat :date="item.publish_date" format="MM月dd hh:mm"
+						:threshold="[60000,3600000*24*7]"></uni-dateformat>
 				</view>
 			</view>
 			<view class="more">
@@ -17,34 +17,36 @@
 				</view>
 			</view>
 		</view>
+		
 		<view class="body">
-			<view class="title">默认标题</view>
+			<view class="title">{{item.title}}</view>
 			<view class="text">
 				<view class="t">
-					因为数仓侧独有的特点，数据按时间分区，比如某天数据只被影响了一个小的时段，也需要重新制作这一整天分区数据回溯，但发现得越早回溯的分区数据也就越少，效率还是有保障。
+						{{item.description}}
 				</view>
 			</view>
 			<view class="piclist">
-				<view class="pic" :class="picArr.length==1?'only':''" v-for="item in picArr" :key="item">
-					<image src="../../static/xiao.png" mode="aspectFill"></image>
+				<view class="pic"  :class="item.picurls.length==1?'only':''" v-for="(i,index) in item.picurls" :key="i">
+					<image  @click="clickPic(index)" :src="i" mode="aspectFill"></image>
 				</view>
 			</view>
 		</view>
+		
 		<view class="info">
 			<view class="box">
 				<text class="iconfont icon-browse">
 				</text>
-				<text>111</text>
+				<text>{{item.view_count}}</text>
 			</view>
 			<view class="box">
 				<text class="iconfont icon-comment">
 				</text>
-				<text>222</text>
+				<text>{{item.comment_count}}</text>
 			</view>
 			<view class="box">
 				<text class="iconfont icon-good">
 				</text>
-				<text>333</text>
+				<text>{{item.like_count}}</text>
 			</view>
 		</view>
 	</view>
@@ -53,10 +55,28 @@
 <script>
 	export default {
 		name: "blog-item",
+		props:{
+			item:{
+				type:Object,
+				default(){
+					return{
+						
+					}
+				}
+			}
+		},
 		data() {
 			return {
 				picArr: [1, 2, 3]
 			};
+		},
+		methods:{
+			clickPic(index){
+				uni.previewImage({
+					urls:this.item.picurls,
+					current:index
+				})
+			}
 		}
 	}
 </script>

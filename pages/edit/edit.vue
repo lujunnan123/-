@@ -30,6 +30,7 @@
 </template>
 
 <script>
+	const db = uniCloud.database()
 	import {getImgSrc,getProvince} from "../../utils/tools.js"
 	export default {
 		data() {
@@ -41,13 +42,14 @@
 				artObj:{
 					title:"",
 					content:"",
-					description:""
+					description:"",
+					province:""
 				}
 			};
 		},
 		onLoad() {
 			getProvince().then(res=>{
-				console.log(res);
+				this.artObj.province = res;
 			})
 		},
 		methods:{
@@ -59,8 +61,28 @@
 						this.artObj.description = res.text.slice(0,50);
 						this.artObj.content = res.html;
 						this.artObj.picurls = getImgSrc(res.html)
-						console.log(this.artObj.picurls);
+						console.log(this.artObj);
+						uni.showLoading({
+							title:"发布中......"
+						})
+						this.addData()
 					}
+				})
+			},
+			addData(){
+				db.collection("quanzi_article").add({
+					...this.artObj
+				}).then(res=>{
+					console.log(res);
+					uni.hideLoading();
+					uni.showToast({
+						title:"发布成功！",
+					})
+					setTimeout(()=>{
+						uni.reLaunch({
+							url:"/pages/index/index"
+						})
+					},800)
 				})
 			},
 			// 初始化

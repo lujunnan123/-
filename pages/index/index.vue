@@ -8,13 +8,14 @@
 			}" :inactiveStyle="{
 				transform:'scale(1)',
 				color:'#888'
-			}" @change="change"></u-tabs>
+			}" @change="clickNav"></u-tabs>
 		</view>
 		<view class="content">
 			<view class="blog" v-for="item in datalist">
-				<blog-item></blog-item>
+				<blog-item :item="item"></blog-item>
 			</view>
 		</view>
+		<!-- // 骨架 -->
 		<view class="loadingState" v-show="loadState">
 			<u-skeleton rows="4" title loading></u-skeleton>
 		</view>
@@ -25,29 +26,49 @@
 </template>
 
 <script>
+	const db = uniCloud.database()
 	export default {
 		data() {
 			return {
 				title: 'Hello',
-				list: [{
-					name: '最新'
-				}, {
-					name: '热门'
-				}],
-				loadState: false,
-				datalist:[1,2,3]
+				list: [
+					{
+						name: '最新',
+						type:"pulish_data"
+					}, 
+					{
+						name: '热门',
+						type:"view_count"
+					}],
+				loadState: true,
+				datalist:[],
+				navAction:0
 			}
 		},
 		onLoad() {
-
+			this.getData()
 		},
 		methods: {
-			change(index) {
-				this.current = index;
+			// 点击导航栏 切换查询逻辑：时间倒序=>浏览量排序
+			clickNav(e) {
+				this.loadState = true;
+				this.datalist = [];
+				this.navAction = e.index;
+				this.getData()
 			},
 			goEdit(){
 				uni.navigateTo({
 					url:"/pages/edit/edit"
+				})
+			},
+			getData(){
+				let artTemp = db.collection("quanzi_article").field("user_id,title,description,picurls,publish_date,view_count,comment_count,like_count ").getTemp();
+				let userTemp = db.collection("uni-id-users").field("_id,username,nickname,avator_file").getTemp();
+				db.collection(artTemp,userTemp).orderBy(this.list[this.navAction].type,"desc").get().then(res=>{
+					// console.log(res);
+					this.datalist = res.result.data
+					// 数据请求成功后，隐藏骨架
+					this.loadState = false
 				})
 			}
 		}
