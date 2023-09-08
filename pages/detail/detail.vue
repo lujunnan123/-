@@ -1,0 +1,229 @@
+<template>
+	<view class="detail">
+		<view class="container">
+			<view v-if="loadState">
+				<!-- // 骨架 -->
+				<view class="loadingState">
+					<u-skeleton rows="4" title loading></u-skeleton>
+				</view>
+			</view>
+			<view v-else> 
+				<view class="title">
+					{{detailObj.title}}
+				</view>
+				<view class="userinfo">
+					<view class="avator">
+						<image src="../../static/xiao.png" mode="aspectFill"></image>
+					</view>
+					<view class="text">
+						<view class="name">{{detailObj.user_id[0].nickname ||detailObj.user_id[0].username}}</view>
+						<view class="small"><uni-dateformat :date="detailObj.publish_date" format="yyyy年MM月dd hh:mm:ss" :threshold="[0,0]"></uni-dateformat>·发布于{{detailObj.province}}</view>
+					</view>
+				</view>
+				<view class="content">
+						<view class="u-content">
+							<u-parse :content="detailObj.content" :tagStyle="tagStyle"></u-parse>
+						</view>						
+				 </view>					
+				 </view>
+			
+			<view class="like">
+				<view class="btn" :class="detailObj.isLike?'active':''" @click="clickLike">
+					<text class="iconfont icon-good"></text>
+					<text v-if="detailObj.like_count">{{detailObj.like_count}}</text>
+				</view>
+				<view class="users">
+					<image src="../../static/xiao.png" mode="aspectFill"></image>
+				</view>
+				<view class="text">
+					<text class="num">{{detailObj.view_count}}</text>个人看过
+				</view>
+			</view>
+		</view>
+
+		<view class="comment">
+			评论：
+		</view>
+	</view>
+</template>
+
+<script>
+	const db = uniCloud.database();
+	const utilsObj = uniCloud.importObject("utilsObj")
+	export default {
+		data() {
+			return {
+				loadState:true,
+				artid: '',
+				tagStyle:{
+					p:"line-height:1.7em",
+					img:"margin:20rpx 0"
+				},
+				detailObj:null
+			};
+		},
+		onLoad(e) {
+			if(!e.id){
+				this.errFun()
+				return;
+			}
+			this.artid = e.id;
+			this.getData()
+			this.readUpdate()
+		},
+		methods:{
+			// 点赞操作
+			async clickLike(){
+				this.detailObj.isLike ? this.detailObj.like_count-- : this.detailObj.like_count++; 
+				this.detailObj.isLike = !this.detailObj.isLike ;
+				// 判断现登录的用户是否已经点赞了改篇文章
+				let count = await db.collection("quanzi_like").where(`article_id == "${this.artid}" && user_id==$cloudEnv_uid`).count();
+				if(count.result.total){					
+					// 向点赞表中移除该用户的文章记录
+					db.collection("quanzi_like").where(`article_id == "${this.artid}" && user_id==$cloudEnv_uid`).remove()
+					utilsObj.operation("quanzi_article","like_count",this.artid,-1)
+				}else{					
+					// 向点赞表中加入 用户id（user_id） 文章id(_id)
+					db.collection("quanzi_like").add({
+						article_id:this.artid
+					})					
+					utilsObj.operation("quanzi_article","like_count",this.artid,1)
+				}
+			},
+			// 修改阅读量
+			readUpdate(){
+				utilsObj.operation("quanzi_article","view_count",this.artid,1).then(res=>{
+					console.log(res);
+				})
+			},
+			// 错误处理
+			errFun(){
+				uni.showToast({
+					title:"参数有误",
+					icon:"none"
+				})
+				setTimeout(()=>{
+					uni.reLaunch({
+						url:"/pages/index/index"
+					})
+				},1000)
+			},
+			getData(){
+				let artTemp = db.collection("quanzi_article").where(`_id == "${this.artid}"`).getTemp();
+				let userTemp=db.collection("uni-id-users").field("_id,username,nickname,avator_file").getTemp();
+				let likeTemp = db.collection("quanzi_like").where(`article_id == "${this.artid}" && user_id==$cloudEnv_uid`).getTemp();
+				db.collection(artTemp,userTemp,likeTemp).get({getOne:true}).then(res=>{
+					this.loadState = false;
+					// this.detailObj = res.result.data;
+					let isLike = res.result.data._id.quanzi_like.length? true : false;
+					res.result.data.isLike = isLike
+					console.log(res);
+					this.detailObj = res.result.data;
+					if(!res.result.data){
+						this.errFun()
+						return
+					}
+				}).catch(err=>{
+					this.errFun();
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.detail {
+		background: #f8f8f8;
+		min-height: calc(100vh - var(--window-top));
+
+		.container {
+			padding: 20rpx;
+			background: #fff;
+
+			.title {
+				font-size: 46rpx;
+				color: #333;
+				line-height: 1.4em;
+				font-weight: 600;
+			}
+
+			.userinfo {
+				padding: 30rpx 0;
+				display: flex;
+
+				.avator {
+					width: 100rpx;
+					height: 100rpx;
+
+					image {
+						height: 100%;
+						width: 100%;
+						overflow: hidden;
+						border-radius: 50%;
+					}
+				}
+
+				.text {
+					padding-left: 20rpx;
+
+					.small {
+						font-size: 30rpx;
+						color: #aaaaaa;
+					}
+				}
+			}
+
+			.content {
+				// margin: 40rpx 0;
+				font-size: 35rpx;
+				font-weight: 500;
+			}
+
+			.like {
+				text-align: center;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 80rpx 50rpx 50rpx;
+
+				.btn {
+					width: 260rpx;
+					height: 120rpx;
+					background: #e4e4e4;
+					color: #fff;
+					font-size: 28rpx;
+					border-radius: 100rpx;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+
+					.iconfont {
+						font-size: 50rpx;
+					}
+					&.active{						
+						background: #00ffff;
+					}
+				}
+
+				.users {
+					width: 80rpx;
+					height: 80rpx;
+					padding: 20rpx 0;
+
+					image {
+						height: 100%;
+						width: 100%;
+						overflow: hidden;
+						border-radius: 50%;
+					}
+				}
+
+				.text {
+					.num {
+						color: #0fcbff;
+					}
+				}
+			}
+		}
+	}
+</style>
