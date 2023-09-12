@@ -13,10 +13,10 @@
 				</view>
 				<view class="userinfo">
 					<view class="avator">
-						<image src="../../static/xiao.png" mode="aspectFill"></image>
+						<image :src="giveAvatar(detailObj)" mode="aspectFill"></image>
 					</view>
 					<view class="text">
-						<view class="name">{{detailObj.user_id[0].nickname ||detailObj.user_id[0].username}}</view>
+						<view class="name">{{getName(detailObj)}}</view>
 						<view class="small"><uni-dateformat :date="detailObj.publish_date" format="yyyy年MM月dd hh:mm:ss" :threshold="[0,0]"></uni-dateformat>·发布于{{detailObj.province}}</view>
 					</view>
 				</view>
@@ -48,6 +48,8 @@
 </template>
 
 <script>
+	import{store} from'@/uni_modules/uni-id-pages/common/store.js'
+	import {giveAvatar,getName} from"../../utils/tools.js"
 	const db = uniCloud.database();
 	const utilsObj = uniCloud.importObject("utilsObj")
 	export default {
@@ -72,10 +74,41 @@
 			this.readUpdate()
 		},
 		methods:{
+			giveAvatar,
+			getName,
 			// 点赞操作
 			async clickLike(){
+				if(!store.hasLogin){
+					uni.showModal({
+						title:"请登录后再点赞",
+						success: (res) => {
+							if(res.confirm){
+								uni.navigateTo({
+									url:"/uni_modules/uni-id-pages/pages/login/login-withpwd"
+								})
+							}
+						}
+					})
+					return
+				}
+				// 防抖处理
+				let time = Date.now();
+				if(time-this.likeTime < 2000){
+					uni.showToast({
+						title:"操作太频繁了，请稍后....",
+						icon:"none"
+					})
+					return
+				}
+				
 				this.detailObj.isLike ? this.detailObj.like_count-- : this.detailObj.like_count++; 
 				this.detailObj.isLike = !this.detailObj.isLike ;
+				this.likeTime = time;
+				// 操作数据库
+				this.likeFun();
+			},
+			// 点赞操作数据库方法
+			async likeFun(){
 				// 判断现登录的用户是否已经点赞了改篇文章
 				let count = await db.collection("quanzi_like").where(`article_id == "${this.artid}" && user_id==$cloudEnv_uid`).count();
 				if(count.result.total){					
@@ -110,15 +143,24 @@
 			},
 			getData(){
 				let artTemp = db.collection("quanzi_article").where(`_id == "${this.artid}"`).getTemp();
-				let userTemp=db.collection("uni-id-users").field("_id,username,nickname,avator_file").getTemp();
+				let userTemp=db.collection("uni-id-users").field("_id,username,nickname,avatar_file").getTemp();
 				let likeTemp = db.collection("quanzi_like").where(`article_id == "${this.artid}" && user_id==$cloudEnv_uid`).getTemp();
-				db.collection(artTemp,userTemp,likeTemp).get({getOne:true}).then(res=>{
+				let tempArr = [artTemp,userTemp];
+				if(store.hasLogin){
+					tempArr.push(likeTemp)
+				}
+				db.collection(...tempArr).get({getOne:true}).then(res=>{
 					this.loadState = false;
-					// this.detailObj = res.result.data;
-					let isLike = res.result.data._id.quanzi_like.length? true : false;
-					res.result.data.isLike = isLike
-					console.log(res);
-					this.detailObj = res.result.data;
+					
+					let isLike = false;
+					if(store.hasLogin) isLike = res.result.data._id.quanzi_like.length? true : false;					
+					res.result.data.isLike = isLike;
+					
+					this.detailObj = res.result.data;					
+					console.log(this.detailObj);
+					uni.setNavigationBarTitle({
+						title:this.detailObj.title
+					})
 					if(!res.result.data){
 						this.errFun()
 						return

@@ -3,9 +3,9 @@
 		<view class="head">
 			<view class="userinfo">
 				<view class="avator">
-					<image :src="item.user_id[0].avatar_file || '../../static/images/sh.png'" mode="aspectFill"></image>
+					<image :src="giveAvatar(item)" mode="aspectFill"></image>
 				</view>
-				<view class="name">{{item.user_id[0].nickname ? item.user_id[0].nickname : item.user_id[0].username }}</view>
+				<view class="name">{{getName(item)}}</view>
 				<view class="time">
 					<uni-dateformat :date="item.publish_date" format="MM月dd hh:mm"
 						:threshold="[60000,3600000*24*7]"></uni-dateformat>
@@ -53,6 +53,7 @@
 </template>
 
 <script>
+	import {getName,giveAvatar} from "../../utils/tools.js"
 	export default {
 		name: "blog-item",
 		props:{
@@ -71,6 +72,8 @@
 			};
 		},
 		methods:{
+			getName,
+			giveAvatar,
 			clickPic(index){
 				uni.previewImage({
 					urls:this.item.picurls,

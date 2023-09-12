@@ -60,3 +60,9 @@ function getIp() {
 		})
 	})
 }
+export function getName(item){
+	return item.user_id[0].nickname ? item.user_id[0].nickname : item.user_id[0].username
+}
+export function giveAvatar(item){
+	return item.user_id[0].avatar_file?.url ?? '../../static/images/用户.png'
+}

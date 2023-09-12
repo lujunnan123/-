@@ -42,7 +42,7 @@ export const mutations = {
 			})
 			try {
 				let res = await usersTable.where("'_id' == $cloudEnv_uid")
-					.field('mobile,nickname,username,email,avatar_file')
+					.field('mobile,nickname,username,email,avatar_file,register_date')
 					.get()
 
 				const realNameRes = await uniIdCo.getRealNameInfo()
@@ -79,7 +79,7 @@ export const mutations = {
 		uni.removeStorageSync('uni_id_token');
 		uni.setStorageSync('uni_id_token_expired', 0)
 		uni.redirectTo({
-			url: `/${pagesJson.uniIdRouter && pagesJson.uniIdRouter.loginPage ? pagesJson.uniIdRouter.loginPage: 'uni_modules/uni-id-pages/pages/login/login-withoutpwd'}`,
+			url: '/pages/self/self',
 		});
 		uni.$emit('uni-id-pages-logout')
 		this.setUserInfo({},{cover:true})

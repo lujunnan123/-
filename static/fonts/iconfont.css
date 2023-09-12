@@ -1,16 +1,48 @@
+
 @font-face {
   font-family: "iconfont"; /* Project id 4234473 */
   src: url('@/static/fonts/iconfont.woff2?t=1693665293606') format('woff2'),
        url('@/static/fonts/iconfont.woff?t=1693665293606') format('woff'),
        url('@/static/fonts/iconfont.ttf?t=1693665293606') format('truetype');
 }
-
 .iconfont {
   font-family: "iconfont" !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-arrow-right:before {
+  content: "\e667";
+}
+
+.icon-bottom:before {
+  content: "\e66a";
+}
+
+.icon-customer-service:before {
+  content: "\e66f";
+}
+
+.icon-discount:before {
+  content: "\e674";
+}
+
+.icon-hide:before {
+  content: "\e677";
+}
+
+.icon-help:before {
+  content: "\e678";
+}
+
+.icon-prompt:before {
+  content: "\e67b";
+}
+
+.icon-refresh:before {
+  content: "\e67c";
 }
 
 .icon-gou:before {

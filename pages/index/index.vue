@@ -63,7 +63,7 @@
 			},
 			getData(){
 				let artTemp = db.collection("quanzi_article").field("user_id,title,description,picurls,publish_date,view_count,comment_count,like_count ").getTemp();
-				let userTemp = db.collection("uni-id-users").field("_id,username,nickname,avator_file").getTemp();
+				let userTemp = db.collection("uni-id-users").field("_id,username,nickname,avatar_file").getTemp();
 				db.collection(artTemp,userTemp).orderBy(this.list[this.navAction].type,"desc").get().then(res=>{
 					// console.log(res);
 					this.datalist = res.result.data
