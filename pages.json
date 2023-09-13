@@ -112,6 +112,45 @@
 			}
 
 		}
+
+		, {
+			"path": "pages/quanzi_article/edit",
+			"style": {
+				"navigationBarTitleText": "编辑"
+			}
+		}, {
+			"path": "pages/quanzi_article/list",
+			"style": {
+				"navigationBarTitleText": "列表"
+			}
+		}
+
+		, {
+			"path": "pages/quanzi_like/list",
+			"style": {
+				"navigationBarTitleText": "列表"
+			}
+		}, {
+			"path": "uni_modules/uni-feedback/pages/opendb-feedback/opendb-feedback",
+			"style": {
+				"navigationBarTitleText": "新增"
+			}
+		}, {
+			"path": "uni_modules/uni-feedback/pages/opendb-feedback/edit",
+			"style": {
+				"navigationBarTitleText": "编辑"
+			}
+		}, {
+			"path": "uni_modules/uni-feedback/pages/opendb-feedback/list",
+			"style": {
+				"navigationBarTitleText": "列表"
+			}
+		}, {
+			"path": "uni_modules/uni-feedback/pages/opendb-feedback/detail",
+			"style": {
+				"navigationBarTitleText": "详情"
+			}
+		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
@@ -136,7 +175,7 @@
 		]
 	},
 	"uniIdRouter": {
-		"loginPage": "uni_modules/uni-id-pages/pages/login/login-withoutpwd", 
+		"loginPage": "uni_modules/uni-id-pages/pages/login/login-withoutpwd",
 		"needLogin": [
 			"pages/edit/edit",
 			"uni_modules/uni-id-pages/pages/userinfo/userinfo"

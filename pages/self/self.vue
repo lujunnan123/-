@@ -46,11 +46,11 @@
 			<view class="list">
 				<view class="group">
 					<view class="item">
-						<view class="left"><text class="iconfont icon-edit"></text>我的长文</view>
+						<view class="left" @click="goContent"><text class="iconfont icon-edit"></text>我的长文</view>
 						<view class="right"><text class="iconfont icon-arrow-right"></text></view>
 					</view>
 					<view class="item">
-						<view class="left"><text class="iconfont icon-good"></text>我的点赞</view>
+						<view class="left"  @click="goContent"><text class="iconfont icon-good"></text>我的点赞</view>
 						<view class="right"><text class="iconfont icon-arrow-right"></text></view>
 					</view>
 					<view class="item">
@@ -63,8 +63,8 @@
 						<view class="left"><text class="iconfont icon-prompt"></text>关于</view>
 						<view class="right"><text class="iconfont icon-arrow-right"></text></view>
 					</view>
-					<view class="item">
-						<view class="left"><text class="iconfont icon-discount"></text>意见反馈</view>
+					<view class="item" @click="goFeedBack()">
+						<view class="left" ><text class="iconfont icon-discount" ></text>意见反馈</view>
 						<view class="right"><text class="iconfont icon-arrow-right"></text></view>
 					</view>
 				</view>
@@ -103,6 +103,27 @@
 			}
 		},
 		methods: {
+			// 跳转 意见反馈
+			goFeedBack(){
+				if(this.goLoginPage()) return
+				uni.navigateTo({
+					url:"/uni_modules/uni-feedback/pages/opendb-feedback/opendb-feedback"
+				})
+			},
+			// 跳转喜欢
+			goLike(){
+				if(this.goLoginPage()) return
+				uni.navigateTo({
+					url:"/pages/quanzi_like/list"
+				})
+			},
+			// 跳转长文
+			goContent(){
+				if(this.goLoginPage()) return
+				uni.navigateTo({
+					url:"/pages/quanzi_article/list"
+				})
+			},
 			// 编辑个人资料
 			toUserInfo(){
 				uni.navigateTo({
@@ -110,13 +131,7 @@
 				})
 			},
 			logout(){
-				if(!this.hasLogin){
-					uni.showToast({
-						title:"未登录",
-						icon:"none"
-					})
-					return
-				}
+				if(this.goLoginPage()) return
 				uni.showModal({
 					title:"是否确认退出",
 					success: (res) => {
@@ -126,6 +141,16 @@
 						}
 					}
 				})
+			},
+			goLoginPage(){
+				if(!this.hasLogin){
+					uni.showToast({
+						title:"未登录",
+						icon:"none"
+					})
+					return true
+				}
+				return false
 			}
 		}
 	}
