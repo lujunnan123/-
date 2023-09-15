@@ -11,34 +11,33 @@
 						:threshold="[60000,3600000*24*7]"></uni-dateformat>
 				</view>
 			</view>
-			<view class="more">
+			<view class="more" @click="clikMore">
 				<view class="iconfont icon-elipsis">
 
 				</view>
 			</view>
 		</view>
-		
 		<view class="body">
-			<view class="title"  @click="goDetail">{{item.title}}</view>
+			<view class="title" @click="goDetail">{{item.title}}</view>
 			<view class="text" @click="goDetail">
 				<view class="t">
-						{{item.description}}
+					{{item.description}}
 				</view>
 			</view>
 			<view class="piclist">
-				<view class="pic"  :class="item.picurls.length==1?'only':''" v-for="(i,index) in item.picurls" :key="i">
-					<image  @click="clickPic(index)" :src="i" mode="aspectFill"></image>
+				<view class="pic" :class="item.picurls.length==1?'only':''" v-for="(i,index) in item.picurls" :key="i">
+					<image @click="clickPic(index)" :src="i" mode="aspectFill"></image>
 				</view>
 			</view>
 		</view>
-		
+
 		<view class="info">
 			<view class="box">
 				<text class="iconfont icon-browse">
 				</text>
 				<text>{{item.view_count}}</text>
 			</view>
-			<view class="box"  @click="goDetail">
+			<view class="box" @click="goDetail">
 				<text class="iconfont icon-comment">
 				</text>
 				<text>{{item.comment_count}}</text>
@@ -49,41 +48,109 @@
 				<text>{{item.like_count}}</text>
 			</view>
 		</view>
+
+
+		<!--  弹出层 -->
+		<view>
+			<u-action-sheet :actions="list" cancelText="取消" :closeOnClickOverlay="true" :closeOnClickAction="true"
+				:show="show" @select="sheetSelect" @close="sheetClose"></u-action-sheet>
+		</view>
+
 	</view>
 </template>
 
 <script>
-	import {getName,giveAvatar} from "../../utils/tools.js"
+	import {
+		getName,
+		giveAvatar
+	} from "../../utils/tools.js"
+	const db = uniCloud.database()
 	export default {
 		name: "blog-item",
-		props:{
-			item:{
-				type:Object,
-				default(){
-					return{
-						
+		props: {
+			item: {
+				type: Object,
+				default () {
+					return {
+
 					}
 				}
 			}
 		},
 		data() {
 			return {
-				picArr: [1, 2, 3]
+				picArr: [1, 2, 3],
+				show: false,
+				list: [{
+						name: "修改",
+						type: "edit",
+						disabled: true
+					},
+					{
+						name: "删除",
+						type: "del",
+						color: "#F56C6C",
+						disabled: true
+					}
+				]
 			};
 		},
-		methods:{
+		methods: {
+			// 点击更多
+			clikMore() {
+				let uid = uniCloud.getCurrentUserInfo().uid;
+				if (uid == this.item.user_id[0]._id || this.uniIDHasRole('admin') || this.uniIDHasRole('webmaster')) {
+					this.list.forEach(item => {
+						item.disabled = false;
+					})
+				}
+				this.show = true
+			},
+			// 弹窗选择
+			sheetSelect(e) {
+				// console.log(e);
+				this.show = false;
+				let type = e.type;
+				if (type == "del") {
+					this.delFun()
+				}
+			},
+			delFun() {
+				uni.showLoading({
+					title: "加载中。。。"
+				})
+				db.collection("quanzi_article").doc(this.item._id).update({
+					delState: true
+				}).then(res => {
+					uni.hideLoading()
+					uni.showToast({
+						title: "删除成功",
+						icon: "none"
+					})
+					this.$emit("delEvent",true)
+				}).catch(err => {
+					uni.hideLoading()
+				})
+			},
+
+
+			// 关闭弹窗
+			sheetClose() {
+				this.show = false
+
+			},
 			getName,
 			giveAvatar,
-			clickPic(index){
+			clickPic(index) {
 				uni.previewImage({
-					urls:this.item.picurls,
-					current:index
+					urls: this.item.picurls,
+					current: index
 				})
 			},
 			// 跳转详情
-			goDetail(){
+			goDetail() {
 				uni.navigateTo({
-					url:"/pages/detail/detail?id="+this.item._id
+					url: "/pages/detail/detail?id=" + this.item._id
 				})
 			}
 		}

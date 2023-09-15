@@ -17,8 +17,7 @@
       </view>
       <uni-load-more :status="loading?'loading':(hasMore ? 'more' : 'noMore')"></uni-load-more>
     </unicloud-db>
-    <uni-fab ref="fab" horizontal="right" vertical="bottom" :pop-menu="false" @fabClick="fabClick" />
-  </view>
+</view>
 </template>
 
 <script>

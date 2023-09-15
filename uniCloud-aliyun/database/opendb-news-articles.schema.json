@@ -1,13 +1,10 @@
 {
 	"bsonType": "object",
-	"required": [
-		"user_id",
-		"title"
-	],
+	"required": ["user_id", "title", "content"],
 	"permission": {
-		"read": true,
+		"read": "doc.user_id == auth.uid && doc.article_status == 0 || doc.article_status == 1",
 		"create": "auth.uid != null",
-		"update": "doc.user_id == auth.uid || 'webmaster' in auth.role",
+		"update": "doc.user_id == auth.uid",
 		"delete": "doc.user_id == auth.uid"
 	},
 	"properties": {
@@ -22,32 +19,21 @@
 				"$env": "uid"
 			}
 		},
-		
-		"delState":{
-			"bsonType":"bool",
-			"title":"是否已被删除",
-			"description":"true代表已删除 false或空 代表正常",
-			"default":false
+		"category_id": {
+			"bsonType": "string",
+			"title": "分类",
+			"description": "分类 id，参考`uni-news-categories`表",
+			"foreignKey": "opendb-news-categories._id",
+			"enum": {
+				"collection": "opendb-news-categories",
+				"field": "name as text, _id as value"
+			}
 		},
 		"title": {
 			"bsonType": "string",
 			"title": "标题",
 			"description": "标题",
 			"label": "标题",
-			"trim": "both"
-		},
-		"province": {
-			"bsonType": "string",
-			"title": "发布省份",
-			"description": "发布省份",
-			"label": "发布省份",
-			"trim": "both"
-		},
-		"description": {
-			"bsonType": "string",
-			"title": "文章摘要",
-			"description": "文章摘要",
-			"label": "文章摘要",
 			"trim": "both"
 		},
 		"content": {
@@ -57,10 +43,29 @@
 			"label": "文章内容",
 			"trim": "right"
 		},
+		"excerpt": {
+			"bsonType": "string",
+			"title": "文章摘录",
+			"description": "文章摘录",
+			"label": "摘要",
+			"trim": "both"
+		},
+		"article_status": {
+			"bsonType": "int",
+			"title": "文章状态",
+			"description": "文章状态：0 草稿箱 1 已发布",
+			"defaultValue": 0,
+			"enum": [{
+				"value": 0,
+				"text": "草稿箱"
+			}, {
+				"value": 1,
+				"text": "已发布"
+			}]
+		},
 		"view_count": {
 			"bsonType": "int",
 			"title": "阅读数量",
-			"defaultValue":55,
 			"description": "阅读数量",
 			"permission": {
 				"write": false
@@ -69,15 +74,41 @@
 		"like_count": {
 			"bsonType": "int",
 			"description": "喜欢数、点赞数",
-			"defaultValue":0,
 			"permission": {
 				"write": false
 			}
 		},
+		"is_sticky": {
+			"bsonType": "bool",
+			"title": "是否置顶",
+			"description": "是否置顶",
+			"permission": {
+				"write": false
+			}
+		},
+		"is_essence": {
+			"bsonType": "bool",
+			"title": "阅读加精",
+			"description": "阅读加精",
+			"permission": {
+				"write": false
+			}
+		},
+		"comment_status": {
+			"bsonType": "int",
+			"title": "开放评论",
+			"description": "评论状态：0 关闭  1 开放",
+			"enum": [{
+				"value": 0,
+				"text": "关闭"
+			}, {
+				"value": 1,
+				"text": "开放"
+			}]
+		},
 		"comment_count": {
 			"bsonType": "int",
 			"description": "评论数量",
-			"defaultValue":21,
 			"permission": {
 				"write": false
 			}
@@ -87,8 +118,8 @@
 			"description": "最后回复用户 id，参考`uni-id-users` 表",
 			"foreignKey": "uni-id-users._id"
 		},
-		"picurls": {
-			"bsonType": "array",
+		"avatar": {
+			"bsonType": "string",
 			"title": "封面大图",
 			"description": "缩略图地址",
 			"label": "封面大图",
@@ -124,7 +155,11 @@
 			"forceDefaultValue": {
 				"$env": "clientIP"
 			}
+		},
+		"mode": {
+			"bsonType": "number",
+			"title": "排版显示模式",
+			"description": "排版显示模式,如左图右文、上图下文等"
 		}
-	},
-	"version": "0.0.1"
+	}
 }

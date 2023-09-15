@@ -12,7 +12,7 @@
 		</view>
 		<view class="content">
 			<view class="blog" v-for="item in datalist">
-				<blog-item :item="item"></blog-item>
+				<blog-item @delEvent="P_delEvent" :item="item"></blog-item>
 			</view>
 		</view>
 		<!-- // 骨架 -->
@@ -49,6 +49,11 @@
 			this.getData()
 		},
 		methods: {
+			// 点击更多 删除数据后，清空列表并重新发起数据请求
+			P_delEvent(){
+				this.datalist = [],
+				this.getData()
+			},
 			// 点击导航栏 切换查询逻辑：时间倒序=>浏览量排序
 			clickNav(e) {
 				this.loadState = true;
@@ -62,13 +67,15 @@
 				})
 			},
 			getData(){
-				let artTemp = db.collection("quanzi_article").field("user_id,title,description,picurls,publish_date,view_count,comment_count,like_count ").getTemp();
+				let artTemp = db.collection("quanzi_article").where(`delState != true`).field("user_id,title,description,picurls,publish_date,view_count,comment_count,like_count ").getTemp();
 				let userTemp = db.collection("uni-id-users").field("_id,username,nickname,avatar_file").getTemp();
 				db.collection(artTemp,userTemp).orderBy(this.list[this.navAction].type,"desc").get().then(res=>{
-					// console.log(res);
+					console.log(res);
 					this.datalist = res.result.data
 					// 数据请求成功后，隐藏骨架
 					this.loadState = false
+				}).catch(err=>{
+					console.log(err);
 				})
 			}
 		}

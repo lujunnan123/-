@@ -25,8 +25,10 @@
 				</view>
 			</view>
 			<view class="bg">
-				<image :src="userInfo.avatar_file.url" mode="aspectFill">
-				</image>
+				<image v-if="hasLogin&&userInfo.avatar_file&&userInfo.avatar_file.url" :src="userInfo.avatar_file.url"
+					mode="aspectFill"></image>
+				<image v-else src="../../uni_modules/uni-id-pages/static/login/uni-fab-login/user.png"
+					mode="aspectFill"></image>
 			</view>
 		</view>
 
@@ -69,8 +71,8 @@
 					</view>
 				</view>
 				<view class="group">
-					<view class="item">
-						<view class="left" @click="logout"><text class="iconfont icon-sign-out"></text>退出登录</view>
+					<view class="item" @click="logout">
+						<view class="left" ><text class="iconfont icon-sign-out"></text>退出登录</view>
 						<view class="right"><text class="iconfont icon-arrow-right"></text></view>
 					</view>
 				</view>
@@ -92,7 +94,7 @@
 			}
 		},
 		onLoad() {
-			
+			console.log(store.userInfo);
 		},
 		computed:{
 			userInfo(){
@@ -198,6 +200,7 @@
 
 					}
 					.text{
+						padding-left: 15rpx;
 						font-size: 50rpx;
 					}
 				}
