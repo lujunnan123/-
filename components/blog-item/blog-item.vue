@@ -42,7 +42,7 @@
 				</text>
 				<text>{{item.comment_count}}</text>
 			</view>
-			<view class="box">
+			<view class="box" :class="item.isLike?'active':''">
 				<text class="iconfont icon-good">
 				</text>
 				<text>{{item.like_count}}</text>
@@ -281,6 +281,9 @@
 				.iconfont {
 					font-size: 40rpx;
 					padding-right: 10rpx;
+				}
+				&.active{
+					color: #0199fe;
 				}
 			}
 		}

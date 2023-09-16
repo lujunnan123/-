@@ -26,7 +26,8 @@
 </template>
 
 <script>
-	const db = uniCloud.database()
+	const db = uniCloud.database();
+	const dbCmd = db.command;
 	export default {
 		data() {
 			return {
@@ -69,9 +70,29 @@
 			getData(){
 				let artTemp = db.collection("quanzi_article").where(`delState != true`).field("user_id,title,description,picurls,publish_date,view_count,comment_count,like_count ").getTemp();
 				let userTemp = db.collection("uni-id-users").field("_id,username,nickname,avatar_file").getTemp();
-				db.collection(artTemp,userTemp).orderBy(this.list[this.navAction].type,"desc").get().then(res=>{
+				db.collection(artTemp,userTemp).orderBy(this.list[this.navAction].type,"desc").get().then(async res=>{
 					console.log(res);
-					this.datalist = res.result.data
+					// 将请求结果中的文章id提取出来
+					let idArr = [];
+					let resDataArr = res.result.data
+					resDataArr.forEach(item=>{
+						idArr.push(item._id)
+					})
+					// 查询quanli_like表 筛选出文章id和当前用户id一致的数据（即获取该用户点赞过的文章id）
+					let likeRes = await db.collection("quanzi_like").where({
+						article_id:dbCmd.in(idArr),
+						user_id:uniCloud.getCurrentUserInfo().uid
+					}).get()
+					// 拿文章id（likeRes）与列表中所有数据（resDataArr）进行匹配，看是否在列表中，并返回该条数据的索引
+					likeRes.result.data.forEach(item=>{
+						let findIndex = resDataArr.findIndex(find=>{
+							return item.article_id == find._id
+						})
+						// 将该条存在点赞表中的数据 的isLike属性设置为true
+						resDataArr[findIndex].isLike = true
+					})
+					
+					this.datalist = resDataArr
 					// 数据请求成功后，隐藏骨架
 					this.loadState = false
 				}).catch(err=>{
