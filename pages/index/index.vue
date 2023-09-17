@@ -15,6 +15,9 @@
 				<blog-item @delEvent="P_delEvent" :item="item"></blog-item>
 			</view>
 		</view>
+		<view class="loadmore">
+			<uni-load-more :status="uniLoad"></uni-load-more>
+		</view>
 		<!-- // 骨架 -->
 		<view class="loadingState" v-show="loadState">
 			<u-skeleton rows="4" title loading></u-skeleton>
@@ -32,6 +35,8 @@
 		data() {
 			return {
 				title: 'Hello',
+				uniLoad:"more",
+				noMore:false,
 				list: [
 					{
 						name: '最新',
@@ -47,6 +52,11 @@
 			}
 		},
 		onLoad() {
+			this.uniLoad ='loading'
+			this.getData()
+		},
+		onReachBottom() {
+			if(this.noMore==true)return
 			this.getData()
 		},
 		methods: {
@@ -59,6 +69,8 @@
 			clickNav(e) {
 				this.loadState = true;
 				this.datalist = [];
+				this.uniLoad = 'more'
+				this.noMore = false
 				this.navAction = e.index;
 				this.getData()
 			},
@@ -70,11 +82,17 @@
 			getData(){
 				let artTemp = db.collection("quanzi_article").where(`delState != true`).field("user_id,title,description,picurls,publish_date,view_count,comment_count,like_count ").getTemp();
 				let userTemp = db.collection("uni-id-users").field("_id,username,nickname,avatar_file").getTemp();
-				db.collection(artTemp,userTemp).orderBy(this.list[this.navAction].type,"desc").get().then(async res=>{
-					console.log(res);
+				db.collection(artTemp,userTemp).orderBy(this.list[this.navAction].type,"desc").skip(this.datalist.length).limit(5).get().then(async res=>{
+					// console.log(res);
 					// 将请求结果中的文章id提取出来
 					let idArr = [];
-					let resDataArr = res.result.data
+					let oldArr = this.datalist;
+					if(res.result.data.length==0){	
+						this.uniLoad = 'noMore'
+						this.noMore = true
+					}
+					let resDataArr =[...oldArr, ...res.result.data];
+		
 					resDataArr.forEach(item=>{
 						idArr.push(item._id)
 					})

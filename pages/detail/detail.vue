@@ -49,9 +49,9 @@
 
 <script>
 	import{store} from'@/uni_modules/uni-id-pages/common/store.js'
-	import {giveAvatar,getName} from"../../utils/tools.js"
+	import {giveAvatar,getName,likeFun} from"../../utils/tools.js"
 	const db = uniCloud.database();
-	const utilsObj = uniCloud.importObject("utilsObj")
+	const utilsObj = uniCloud.importObject("utilsObj",{customUI:true})
 	export default {
 		data() {
 			return {
@@ -105,24 +105,10 @@
 				this.detailObj.isLike = !this.detailObj.isLike ;
 				this.likeTime = time;
 				// 操作数据库
-				this.likeFun();
+				likeFun(this.artid);
 			},
-			// 点赞操作数据库方法
-			async likeFun(){
-				// 判断现登录的用户是否已经点赞了改篇文章
-				let count = await db.collection("quanzi_like").where(`article_id == "${this.artid}" && user_id==$cloudEnv_uid`).count();
-				if(count.result.total){					
-					// 向点赞表中移除该用户的文章记录
-					db.collection("quanzi_like").where(`article_id == "${this.artid}" && user_id==$cloudEnv_uid`).remove()
-					utilsObj.operation("quanzi_article","like_count",this.artid,-1)
-				}else{					
-					// 向点赞表中加入 用户id（user_id） 文章id(_id)
-					db.collection("quanzi_like").add({
-						article_id:this.artid
-					})					
-					utilsObj.operation("quanzi_article","like_count",this.artid,1)
-				}
-			},
+			
+			
 			// 修改阅读量
 			readUpdate(){
 				utilsObj.operation("quanzi_article","view_count",this.artid,1).then(res=>{

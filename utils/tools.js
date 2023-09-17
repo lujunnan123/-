@@ -66,3 +66,22 @@ export function getName(item){
 export function giveAvatar(item){
 	return item.user_id[0].avatar_file?.url ?? '../../static/images/用户.png'
 }
+
+// 点赞操作数据库方法
+const db = uniCloud.database();
+const utilsObj = uniCloud.importObject("utilsObj",{customUI:true});
+export function likeFun(artid){
+	// 判断现登录的用户是否已经点赞了改篇文章
+	let count = db.collection("quanzi_like").where(`article_id == "${artid}" && user_id==$cloudEnv_uid`).count();
+	if(count.result?.total){					
+		// 向点赞表中移除该用户的文章记录
+		db.collection("quanzi_like").where(`article_id == "${artid}" && user_id==$cloudEnv_uid`).remove()
+		utilsObj.operation("quanzi_article","like_count",artid,-1)
+	}else{			
+		// 向点赞表中加入 用户id（user_id） 文章id(_id)
+		db.collection("quanzi_like").add({
+			article_id:artid
+		})				
+		utilsObj.operation("quanzi_article","like_count",artid,1)
+	}
+}

@@ -42,7 +42,7 @@
 				</text>
 				<text>{{item.comment_count}}</text>
 			</view>
-			<view class="box" :class="item.isLike?'active':''">
+			<view class="box" :class="item.isLike?'active':''" @click="clickLike">
 				<text class="iconfont icon-good">
 				</text>
 				<text>{{item.like_count}}</text>
@@ -62,8 +62,10 @@
 <script>
 	import {
 		getName,
-		giveAvatar
+		giveAvatar,
+		likeFun
 	} from "../../utils/tools.js"
+	import{store} from'@/uni_modules/uni-id-pages/common/store.js'
 	const db = uniCloud.database()
 	export default {
 		name: "blog-item",
@@ -96,6 +98,37 @@
 			};
 		},
 		methods: {
+			// 点赞
+			clickLike(){
+				if(!store.hasLogin){
+					uni.showModal({
+						title:"请登录后再点赞",
+						success: (res) => {
+							if(res.confirm){
+								uni.navigateTo({
+									url:"/uni_modules/uni-id-pages/pages/login/login-withpwd"
+								})
+							}
+						}
+					})
+					return
+				}
+				
+				// 防抖处理
+				let time = Date.now();
+				if(time-this.likeTime < 2000){
+					uni.showToast({
+						title:"操作太频繁了，请稍后....",
+						icon:"none"
+					})
+					return
+				}			
+					
+				this.item.isLike ? this.item.like_count-- : this.item.like_count++; 
+				this.item.isLike = !this.item.isLike ;
+				this.likeTime = time;
+				likeFun(this.item._id)
+			},
 			// 点击更多
 			clikMore() {
 				let uid = uniCloud.getCurrentUserInfo().uid;
