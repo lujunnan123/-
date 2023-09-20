@@ -57,9 +57,6 @@
 				</view>
 			</view>
 		</view>
-		
-		
-		
 		<comment-frame :commentObj="commentObj" @commentEnv="PcommentEnv"></comment-frame>
 	</view>
 </template>

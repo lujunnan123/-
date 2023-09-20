@@ -1,25 +1,25 @@
 <template>
-			<view class="comment-item">
-				<view class="avatar">
-					<u-avatar :src="giveAvatar(item)" size="26"></u-avatar>
+	<view class="comment-item" @click="goreply">
+		<view class="avatar">
+			<u-avatar :src="giveAvatar(item)" size="26"></u-avatar>
+		</view>
+		<view class="wrap">
+			<view class="username">
+				{{getName(item)}}
+				<text class="iconfont icon-close" @click.stop="delComment"></text>
+			</view>
+			<view class="comment-content">{{item.comment_content}}</view>
+			<view class="info">
+				<view class="reply-btn">3回复</view>
+				<view class="">
+					<uni-dateformat :date="item.comment_date" :threshold="[60000,36000000]"></uni-dateformat>
 				</view>
-				<view class="wrap">
-					<view class="username">
-						{{getName(item)}}
-						<text class="iconfont icon-close" @click="delComment"></text>
-					</view>
-					<view class="comment-content">{{item.comment_content}}</view>
-					<view class="info">
-						<view class="reply-btn">3回复</view>
-						<view class="">
-							<uni-dateformat :date="item.comment_date" :threshold="[60000,36000000]"></uni-dateformat>
-						</view>
-						<view class="">
-							{{item.province}}
-						</view>
-					</view>
+				<view class="">
+					{{item.province}}
 				</view>
 			</view>
+		</view>
+	</view>
 
 </template>
 
@@ -27,6 +27,9 @@
 	
 	import {giveAvatar,getName,likeFun} from"../../utils/tools.js"
 	const db = uniCloud.database()
+	const utilsObj = uniCloud.importObject("utilsObj",{
+		customUI:true
+	})
 	export default {
 		props:{
 			item:{
@@ -44,24 +47,41 @@
 		},
 		methods:{
 			giveAvatar,getName,
-			
+			goreply(){
+				uni.navigateTo({
+					url:"/pages/reply/reply"
+				})
+			},
 			removeComment(){
 				db.collection("quanzi_comment").doc(this.item._id).remove().then(res=>{
 					uni.showToast({
 						title:'删除成功'
 					})
 					this.$emit("removeEnv",{id:this.item._id})
+					if(this.item.comment_count>0) utilsObj.operation("quanzi_article","comment_count",this.item.article_id,-1)
+					
 				})
 			},
+			// 删除评论
 			delComment(){
-				uni.showModal({
-					title:"是否删除",
-					success: (res) => {
-						if(res.confirm){
-							this.removeComment()
+				// 权限校验
+				let uid = uniCloud.getCurrentUserInfo().uid;
+				if (uid == this.item.user_id[0]._id || this.uniIDHasRole('admin') || this.uniIDHasRole('webmaster')) {
+					uni.showModal({
+						title:"是否删除",
+						success: (res) => {
+							if(res.confirm){
+								this.removeComment()
+							}
 						}
-					}
+					})
+					return;
+				}
+				uni.showToast({
+					title:"权限不够",
+					icon:"error"
 				})
+				
 			},
 		}
 	}

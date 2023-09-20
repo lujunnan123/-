@@ -8,6 +8,9 @@
 <script>
 	import {getProvince} from "@/utils/tools.js"
 	const db = uniCloud.database()
+	const utilsObj = uniCloud.importObject("utilsObj",{
+		customUI:true
+	})
 	export default {
 		name:"comment-frame",
 		props:{
@@ -48,6 +51,7 @@
 					})
 					this.$emit("commentEnv",{_id:res.result.id,comment_content:this.replyContent,"province":province,comment_date:Date.now()})
 					this.replyContent = ""
+					utilsObj.operation("quanzi_article","comment_count",this.commentObj.article_id,1)
 				})
 			}
 		}

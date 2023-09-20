@@ -40,7 +40,7 @@
 			<view class="box" @click="goDetail">
 				<text class="iconfont icon-comment">
 				</text>
-				<text>{{item.comment_count}}</text>
+				<text>{{item.comment_count && item.comment_count>0 ? item.comment_count : '评论'}}</text>
 			</view>
 			<view class="box" :class="item.isLike?'active':''" @click="clickLike">
 				<text class="iconfont icon-good">

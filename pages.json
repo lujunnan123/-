@@ -151,7 +151,16 @@
 				"navigationBarTitleText": "详情"
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/reply/reply",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "回复评论",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "闲虾米的圈子",
