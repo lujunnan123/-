@@ -35,13 +35,13 @@
 		<view class="main">
 			<view class="info">
 				<view class="item">
-					<text>33</text>获赞
+					<text>{{total.likeNum}}</text>获赞
 				</view>
 				<view class="item">
 					<text>22</text>评论
 				</view>
 				<view class="item">
-					<text>11</text>发文
+					<text>{{total.artNum}}</text>发文
 				</view>
 			</view>
 
@@ -87,14 +87,20 @@
 	import{
 		store,mutations
 	} from'@/uni_modules/uni-id-pages/common/store.js'
+	const db = uniCloud.database()
 	export default {
 		data() {
 			return {
-				title: 'Hello'
+				title: 'Hello',
+				total:{
+					artNum:0,
+					likeNum:0
+				}
 			}
 		},
 		onLoad() {
 			console.log(store.userInfo);
+			this.getTotal()
 		},
 		computed:{
 			userInfo(){
@@ -105,6 +111,15 @@
 			}
 		},
 		methods: {
+			async getTotal(){
+				if(!this.hasLogin) return
+				let artCount = await db.collection("quanzi_article").where(`user_id == $cloudEnv_uid`).count()
+				this.total.artNum =artCount.result.total;
+				let likeCount = await db.collection("quanzi_article").where(`user_id == $cloudEnv_uid`)
+				.groupBy('user_id')
+				.groupField('sum(like_count) as totalScore').get()
+				this.total.likeNum = likeCount.result.data[0].totalScore
+			},
 			// 跳转 意见反馈
 			goFeedBack(){
 				if(this.goLoginPage()) return

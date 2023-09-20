@@ -106,6 +106,7 @@
 						success: (res) => {
 							if(res.confirm){
 								uni.navigateTo({
+									// 标注1
 									url:"/uni_modules/uni-id-pages/pages/login/login-withpwd"
 								})
 							}
