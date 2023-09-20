@@ -110,8 +110,9 @@
 			},
 			// 评论成功后回调（新增评论无感操作）
 			PcommentEnv(e){
+				console.log(e);
 				this.commentList.unshift({
-					...commentObj,
+					...this.commentObj,
 					...e,
 					user_id:[store.userInfo],	
 				})
