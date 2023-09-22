@@ -107,7 +107,7 @@
 			},
 			// 评论成功后回调（新增评论无感操作）
 			PcommentEnv(e){
-				console.log(e);
+				// console.log(e);
 				this.commentList.unshift({
 					...this.commentObj,
 					...e,
@@ -115,13 +115,29 @@
 				})
 			},
 			// 获取评论和用户部分信息
-			getComment(){
-				let commentTemp = db.collection("quanzi_comment").where(`article_id == '${this.artid}'`).orderBy("comment_date desc").limit(5).getTemp();
+			async getComment(){
+				let commentTemp = db.collection("quanzi_comment").where(`article_id == '${this.artid}' && comment_type == 0 `).orderBy("comment_date desc").limit(5).getTemp();
 				let userTemp = db.collection("uni-id-users").field("_id,avatar_file,username,nikename").getTemp();
-				db.collection(commentTemp,userTemp).get().then(res=>{
-					this.commentList = res.result.data
-					if(res.result.data == 0) this.noComment = true
+				let res = await db.collection(commentTemp,userTemp).get();
+				// 获取该条文章内所有的一级评论信息的id
+				let idArr = res.result.data.map(item=>{
+					return item._id
 				})
+				// 拿该篇文章的所有一级评论id查询获取评论表对应信息
+				// 并对查询到的信息 依据reply_comment_id分组 统计
+				let replyArr = await db.collection("quanzi_comment").where({
+					reply_comment_id:db.command.in(idArr)
+				}).groupBy('reply_comment_id').groupField('count(*) as totalReply').get();
+				// 
+				res.result.data.forEach(item=>{
+					// 查询 回复评论id(reply_comment_id)与评论id(item._id)一致的记录，即为该条评论的回复评论
+					let index = replyArr.result.data.findIndex(find=>{
+						return find.reply_comment_id==item._id
+					})
+					if(index>-1) item.totalReply = replyArr.result.data[index].totalReply
+				})
+				if(res.result.data == 0) this.noComment = true
+				this.commentList = res.result.data
 			},
 			giveAvatar,
 			getName,

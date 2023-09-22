@@ -12,7 +12,12 @@
 		</view>
 		<view class="content">
 			<view class="blog" v-for="item in datalist">
-				<blog-item @delEvent="P_delEvent" :item="item"></blog-item>
+				<blog-item 
+				:isLike.sync="item.isLike" 
+				@delEvent="P_delEvent" 
+				:item="item"
+				:like_count.sync = "item.like_count"
+				></blog-item>
 			</view>
 		</view>
 		<view class="loadmore">

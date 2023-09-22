@@ -21,6 +21,10 @@
 						
 					}
 				}
+			},
+			placeholder:{
+				type:String,
+				default:"评论点什么的吧~"
 			}
 		},
 		onLoad() {
@@ -28,7 +32,6 @@
 		data() {
 			return {
 				replyContent:"",
-				placeholder:"评论点什么的吧~"
 			};
 		},
 		methods:{

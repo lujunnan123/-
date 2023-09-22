@@ -6,11 +6,11 @@
 		<view class="wrap">
 			<view class="username">
 				{{getName(item)}}
-				<text class="iconfont icon-close" @click.stop="delComment"></text>
+				<text v-if="!closeBtn" class="iconfont icon-close" @click.stop="delComment"></text>
 			</view>
 			<view class="comment-content">{{item.comment_content}}</view>
 			<view class="info">
-				<view class="reply-btn">3回复</view>
+				<view class="reply-btn" v-if="!childState && item.totalReply>0">{{item.totalReply}}&nbsp;回复</view>
 				<view class="">
 					<uni-dateformat :date="item.comment_date" :threshold="[60000,36000000]"></uni-dateformat>
 				</view>
@@ -37,6 +37,14 @@
 				default(){
 					return
 				}
+			},
+			childState:{
+				type:Boolean,
+				default:false
+			},
+			closeBtn:{
+				type:Boolean,
+				default:false
 			}
 		},
 		name: "comment-item",
@@ -47,7 +55,12 @@
 		},
 		methods:{
 			giveAvatar,getName,
+			// 跳转评论详情
 			goreply(){
+				// 禁止跳转
+				if(this.childState) return
+				// 设置缓存
+				uni.setStorageSync("replyItem",this.item)
 				uni.navigateTo({
 					url:"/pages/reply/reply"
 				})

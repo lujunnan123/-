@@ -77,7 +77,12 @@
 
 					}
 				}
-			}
+			},
+			isLike:Boolean,
+			like_count:Number
+		},
+		onLoad() {
+			console.log("onload:",this.isLike);
 		},
 		data() {
 			return {
@@ -125,8 +130,15 @@
 					return
 				}			
 					
-				this.item.isLike ? this.item.like_count-- : this.item.like_count++; 
-				this.item.isLike = !this.item.isLike ;
+				// this.item.isLike ? this.item.like_count-- : this.item.like_count++; 
+				// this.item.isLike = !this.item.isLike ;
+				let like_count = this.item.like_count
+				this.item.isLike?like_count-- : like_count++; 
+				let isLike = !this.item.isLike ;
+				console.log(isLike);
+				this.$emit("update:isLike",isLike);
+				this.$emit("update:like_count",like_count);
+				
 				this.likeTime = time;
 				likeFun(this.item._id)
 			},
